@@ -1,0 +1,58 @@
+[
+    {
+        "sourcePath": "extractTableByName | 'Complete Medium'",
+        "ldmField": "insertTableToLDM | idbsBioreactorV2CompleteMediumProcessMap",
+        "ldmPath": "processes[]",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "extractTableByName | 'Complete Medium'",
+        "ldmField": "enrichLDMTable | idbsBioreactorV2CompleteMediumProcessIDMap | Complete Media Index | processes",
+        "ldmPath": "",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "extractTableByName | 'Experiment Feed Setup'",
+        "ldmField": "insertTableToLDM | idbsBioreactorV2ExperimentFeedSetupProcessMap",
+        "ldmPath": "processes[]",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "lookupAndJoinTables | 'Experiment Feed Setup' | Feed 1 Inventory Item | 'Complete Medium' | Complete Reagent Name",
+        "ldmField": "enrichLDMTable | idbsBioreactorV2ExperimentFeedSetupProcessMap2 | Feed Configuration | processes",
+        "ldmPath": "",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "extractTableByName | 'Experiment Feed Setup'",
+        "ldmField": "enrichLDMTable | idbsBioreactorV2ExperimentFeedSetupProcessMap3 | Feed Configuration | processes",
+        "ldmPath": "",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "lookupAndJoinTables | 'Experiment Feed Setup' | Feed 2 Inventory Item | 'Complete Medium' | Complete Reagent Name",
+        "ldmField": "enrichLDMTable | idbsBioreactorV2ExperimentFeedSetupProcessMap2 | Feed Configuration | processes",
+        "ldmPath": "",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "extractTableByName | 'Experiment Feed Setup'",
+        "ldmField": "enrichLDMTable | idbsBioreactorV2ExperimentFeedSetupProcessMap4 | Feed Configuration | processes",
+        "ldmPath": "",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    },
+    {
+        "sourcePath": "lookupAndJoinTables | 'Experiment Feed Setup' | Feed 3 Inventory Item | 'Complete Medium' | Complete Reagent Name",
+        "ldmField": "enrichLDMTable | idbsBioreactorV2ExperimentFeedSetupProcessMap2 | Feed Configuration | processes",
+        "ldmPath": "",
+        "preserve": true,
+        "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
+    }
+]
