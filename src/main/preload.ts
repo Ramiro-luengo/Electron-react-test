@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('electron', {
 // Source: https://dev.to/taw/electron-adventures-episode-22-file-manager-in-react-hi2
 const fileContents = (filepath: string) => {
   const localData: string = path.join(dataPath, filepath);
-  let fileData: string | Object = { error: `File ${filepath} doesn't exist.` };
+  let fileData = { error: `File ${filepath} doesn't exist.` };
 
   if (fs.existsSync(localData)) {
     const data = fs.readFileSync(localData, { encoding: 'utf-8' });
@@ -36,7 +36,7 @@ const fileContents = (filepath: string) => {
     fileData = JSON.parse(data);
   }
 
-  return fileData;
+  return { data: fileData };
 };
 
 contextBridge.exposeInMainWorld('fileApi', { fileContents });

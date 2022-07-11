@@ -6,10 +6,10 @@ import Tables from './components/tables';
 const Hello = () => {
   return (
     <div>
-      <div className="Hello">
+      <div className="Center">
         <img width="200px" alt="icon" src={icon} />
       </div>
-      <div className="Hello">
+      <div className="Center">
         <Link to="/tables">
           <button type="button">Tables</button>
         </Link>

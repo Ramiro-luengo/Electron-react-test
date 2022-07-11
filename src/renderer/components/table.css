@@ -1,0 +1,22 @@
+.tableContainer {
+  background: grey;
+  border: 2px solid black;
+  border-radius: 15px;
+  color: black;
+  /* color: rgb(220, 155, 71); */
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 2%;
+  /* word-break: break-all; */
+}
+
+.tablesContainer {
+  display: flex;
+  /* justify-content: unset;
+  align-items: unset; */
+  column-gap: 10px;
+}
+
+li {
+  list-style: circle;
+}
