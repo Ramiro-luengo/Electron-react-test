@@ -1,5 +1,5 @@
 .tableContainer {
-  background: grey;
+  background: #eeeeee;
   border: 2px solid black;
   border-radius: 15px;
   color: black;
@@ -10,11 +10,29 @@
   /* word-break: break-all; */
 }
 
+.joinContainer {
+  background: rgba(251, 229, 163, 255);
+  border: 2px solid black;
+  border-radius: 15px;
+  color: black;
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 2%;
+}
+
+.joinsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .tablesContainer {
   display: flex;
   /* justify-content: unset;
   align-items: unset; */
-  column-gap: 10px;
+  column-gap: 30px;
+  /* justify-content: space-around; */
 }
 
 li {

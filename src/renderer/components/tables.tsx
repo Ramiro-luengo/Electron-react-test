@@ -1,16 +1,17 @@
+import Xarrow from 'react-xarrows';
+
 import {
   TableMappingComponents,
   TableMappingComponent,
   ErrorType,
 } from 'renderer/types';
-
 import './table.css';
 
 interface MappedTable {
   name: string;
   mappings: Array<string>;
   enrichments: Array<string>;
-  joins: Array<string>;
+  tableId: number;
 }
 
 const extractUniqueEntityNames = (
@@ -31,15 +32,23 @@ const extractUniqueEntityNames = (
   return Array.from(uniqueTableNames);
 };
 
+const Join = (join: string, idx: number, tableIdx: number) => {
+  return (
+    <div id={`join_${tableIdx}_${idx}`} className="joinContainer">
+      {join}
+    </div>
+  );
+};
+
 const processInstructions = (instructions: Array<TableMappingComponent>) => {
   const tableNames: Array<string> = extractUniqueEntityNames(instructions);
 
   const tables: Array<MappedTable> = [];
+  const joins: Set<string> = new Set();
   for (let i = 0; i < tableNames.length; i++) {
     const name = tableNames[i];
     const mappings: Set<string> = new Set();
     const enrichments: Set<string> = new Set();
-    const joins: Set<string> = new Set();
     for (let j = 0; j < instructions.length; j++) {
       const instruction = instructions[j];
       const { sourcePath, ldmField } = instruction;
@@ -69,46 +78,66 @@ const processInstructions = (instructions: Array<TableMappingComponent>) => {
       name,
       mappings: Array.from(mappings).sort(),
       enrichments: Array.from(enrichments).sort(),
-      joins: Array.from(joins).sort(),
+      tableId: i,
     });
   }
 
-  return tables;
+  return { tables, joins: Array.from(joins).sort() };
 };
 
-const Table = ({ name, mappings, enrichments, joins }: MappedTable) => {
+const Table = (tableData: MappedTable, joins?: Array<string>) => {
+  const { name, mappings, enrichments, tableId } = tableData;
+
   return (
-    <div className="tableContainer">
-      <div style={{ 'font-weight': 'bold' }}>{name}</div>
-      <div
-        style={{
-          'padding-top': '5%',
-          'text-decoration': 'underline',
-        }}
-      >
-        LDM Table Mappings:
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        columnGap: 'inherit',
+      }}
+    >
+      <div className="tableContainer" id={`table_${tableId}`}>
+        <div style={{ fontWeight: 'bold' }}>{name}</div>
+        <div
+          style={{
+            'padding-top': '5%',
+            'text-decoration': 'underline',
+          }}
+        >
+          LDM Table Mappings:
+        </div>
+        <ul>
+          {mappings.map((mapping) => (
+            <li>{mapping}</li>
+          ))}
+        </ul>
+        <div style={{ paddingTop: '5%', textDecoration: 'underline' }}>
+          LDM Table Enrichments:
+        </div>
+        <ul>
+          {enrichments.map((enrichment) => (
+            <li>{enrichment}</li>
+          ))}
+        </ul>
       </div>
-      <ul>
-        {mappings.map((mapping) => (
-          <li>{mapping}</li>
-        ))}
-      </ul>
-      <div style={{ 'padding-top': '5%', 'text-decoration': 'underline' }}>
-        LDM Table Enrichments:
-      </div>
-      <ul>
-        {enrichments.map((enrichment) => (
-          <li>{enrichment}</li>
-        ))}
-      </ul>
-      <div style={{ 'padding-top': '5%', 'text-decoration': 'underline' }}>
-        LDM Table Joins:
-      </div>
-      <ul>
-        {joins.map((join) => (
-          <li>{join}</li>
-        ))}
-      </ul>
+      {joins ? (
+        <div className="joinsContainer">
+          {joins.map((join, idx) => Join(join, idx, tableId))}
+        </div>
+      ) : (
+        ''
+      )}
+      {joins
+        ? joins.map((_, idx) => (
+            <Xarrow
+              strokeWidth={1}
+              showHead={false}
+              color="white"
+              start={`table_${tableId}`}
+              end={`join_${tableId}_${idx}`}
+            />
+          ))
+        : ''}
     </div>
   );
 };
@@ -122,9 +151,25 @@ const Tables = () => {
   }
 
   const instructions = fileData.data;
-  const tables = processInstructions(instructions);
+  const { tables, joins } = processInstructions(instructions);
+  let newJoins = joins;
+  return (
+    <div>
+      <div className="tablesContainer">
+        {tables.map((table) => {
+          const tableJoins = newJoins.filter((join) =>
+            join.includes(table.name)
+          );
+          newJoins = newJoins.filter((join) => !tableJoins.includes(join));
+          if (tableJoins) {
+            return Table(table, tableJoins);
+          }
 
-  return <div className="tablesContainer">{tables.map(Table)}</div>;
+          return Table(table);
+        })}
+      </div>
+    </div>
+  );
 };
 
 export default Tables;
