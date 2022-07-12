@@ -1,5 +1,6 @@
 .tableContainer {
-  background: #eeeeee;
+  /* background: #eeeeee; */
+  background: grey;
   border: 2px solid black;
   border-radius: 15px;
   color: black;
@@ -8,6 +9,11 @@
   padding-right: 2%;
   padding-top: 2%;
   /* word-break: break-all; */
+}
+
+.containerTitle {
+  padding-top: 5%;
+  text-decoration: underline;
 }
 
 .joinContainer {
@@ -29,9 +35,9 @@
 
 .tablesContainer {
   display: flex;
-  /* justify-content: unset;
-  align-items: unset; */
-  column-gap: 30px;
+  justify-content: unset;
+  align-items: unset;
+  column-gap: 20%;
   /* justify-content: space-around; */
 }
 
