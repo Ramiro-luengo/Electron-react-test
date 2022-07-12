@@ -164,8 +164,6 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
                 .map((v) => v.replaceAll("'", '').trim());
               const labelIdx: number = splittedName.indexOf(tableName) + 1;
 
-              console.log(splittedName);
-
               return (
                 <Xarrow
                   strokeWidth={1}
