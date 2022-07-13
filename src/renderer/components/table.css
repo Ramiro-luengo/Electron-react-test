@@ -1,4 +1,4 @@
-.tableContainer {
+.table {
   /* background: #eeeeee; */
   background: grey;
   border: 2px solid black;
@@ -16,7 +16,7 @@
   text-decoration: underline;
 }
 
-.joinContainer {
+.join {
   background: rgba(251, 229, 163, 255);
   border: 2px solid black;
   border-radius: 15px;

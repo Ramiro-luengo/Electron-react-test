@@ -48,7 +48,7 @@ const Join = (mappedJoin: MappedJoin) => {
   const { id, /* name, */ enrichments } = mappedJoin;
 
   return (
-    <div id={`join_${id}`} className="joinContainer">
+    <div id={`join_${id}`} className="join">
       {/* <div className="containerTitle">{name}</div> */}
       <div className="containerTitle">LDM Table Enrichments:</div>
       <ul>
@@ -133,7 +133,7 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
         columnGap: '14%',
       }}
     >
-      <div className="tableContainer" id={`table_${tableId}`}>
+      <div className="table" id={`table_${tableId}`}>
         <div style={{ fontWeight: 'bold' }}>{tableName}</div>
         <div className="containerTitle">LDM Table Mappings:</div>
         <ul>
