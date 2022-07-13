@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import Xarrow, { Xwrapper } from 'react-xarrows';
+import Select from 'react-select';
 
 import {
   TableMappingComponents,
@@ -149,7 +151,9 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
 
       {/* -------- Joins -------- */}
       {joins?.some((join) => !join.drawn) ? (
-        <div className="joinsContainer">{joins.map(Join)}</div>
+        <div className="joinsContainer">
+          {joins.filter(({ drawn }) => !drawn).map(Join)}
+        </div>
       ) : (
         ''
       )}
@@ -189,32 +193,63 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
   );
 };
 
-const Tables = () => {
+const TablesContainer = ({ filename }) => {
   const fileData: TableMappingComponents | ErrorType =
-    window.fileApi.fileContents(`table_mapping.json`);
+    window.fileApi.fileContents(filename);
 
   if (fileData.error) {
     return <div>Error: {fileData.error}</div>;
   }
 
-  const instructions = fileData.data;
-  const { tables, joins } = processInstructions(instructions);
+  const { tables, joins } = processInstructions(fileData);
   let newJoins = joins;
+
+  return (
+    <div className="tablesContainer">
+      {tables.map((table) => {
+        const tableJoins = newJoins.filter((join) =>
+          join.name.includes(table.name)
+        );
+        newJoins = newJoins.filter((join) => !tableJoins.includes(join.name));
+        if (tableJoins) {
+          return Table(table, tableJoins);
+        }
+
+        return Table(table);
+      })}
+    </div>
+  );
+};
+
+const Tables = () => {
+  const dirContents = window.fileApi.directoryContents('src/data');
+  const colourStyles = {
+    option: (styles) => {
+      return {
+        ...styles,
+        color: 'black',
+      };
+    },
+  };
+
+  const firstDir = dirContents[0];
+  const [filename, setFilename] = useState(firstDir.name);
+
   return (
     <div>
-      <div className="tablesContainer">
-        {tables.map((table) => {
-          const tableJoins = newJoins.filter((join) =>
-            join.name.includes(table.name)
-          );
-          newJoins = newJoins.filter((join) => !tableJoins.includes(join.name));
-          if (tableJoins) {
-            return Table(table, tableJoins);
-          }
-
-          return Table(table);
-        })}
+      <div style={{ maxWidth: '400px', margin: 'auto' }}>
+        <Select
+          name="dir"
+          placeholder={firstDir.name}
+          styles={colourStyles}
+          onChange={(input) => setFilename(input?.value.name)}
+          options={dirContents.map((file) => ({
+            value: file,
+            label: file.name,
+          }))}
+        />
       </div>
+      <TablesContainer filename={filename} />
     </div>
   );
 };

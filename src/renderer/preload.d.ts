@@ -16,6 +16,7 @@ declare global {
     };
     fileApi: {
       fileContents(filename: string): TableMappingComponents | ErrorType;
+      directoryContents(dir: string): Array<{ name: string; type: string }>;
     };
   }
 }

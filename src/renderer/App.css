@@ -4,8 +4,8 @@ body {
   height: 100vh;
   background: #1a242b;
   font-family: sans-serif;
-  overflow-y: hidden;
-  display: flex;
+  /* overflow-y: hidden; */
+  /* display: flex; */
   justify-content: center;
   align-items: center;
 }

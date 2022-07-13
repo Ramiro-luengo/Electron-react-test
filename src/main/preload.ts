@@ -1,9 +1,10 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import fs from 'fs';
 import path from 'path';
-// const fsPromises = fs.promises;
 
-const dataPath = 'data';
+const fsPromises = fs.promises;
+
+const dataPath = 'src/data';
 
 export type Channels = 'ipc-example';
 
@@ -28,15 +29,29 @@ contextBridge.exposeInMainWorld('electron', {
 // Source: https://dev.to/taw/electron-adventures-episode-22-file-manager-in-react-hi2
 const fileContents = (filepath: string) => {
   const localData: string = path.join(dataPath, filepath);
+
   let fileData = { error: `File ${filepath} doesn't exist.` };
-
-  if (fs.existsSync(localData)) {
-    const data = fs.readFileSync(localData, { encoding: 'utf-8' });
-
-    fileData = JSON.parse(data);
+  try {
+    if (fs.existsSync(localData)) {
+      fileData = JSON.parse(fs.readFileSync(localData));
+    }
+  } catch (err) {
+    fileData = { error: `File ${filepath} parsing error` };
   }
 
-  return { data: fileData };
+  return fileData;
 };
 
-contextBridge.exposeInMainWorld('fileApi', { fileContents });
+const directoryContents = (dir: string) => {
+  const results = fs.readdirSync(dir, { withFileTypes: true });
+
+  return results.map((entry) => ({
+    name: entry.name,
+    type: entry.isDirectory() ? 'directory' : 'file',
+  }));
+};
+
+contextBridge.exposeInMainWorld('fileApi', {
+  fileContents,
+  directoryContents,
+});

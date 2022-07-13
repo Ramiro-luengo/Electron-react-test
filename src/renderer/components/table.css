@@ -12,7 +12,7 @@
 }
 
 .containerTitle {
-  padding-top: 5%;
+  padding-top: 2%;
   text-decoration: underline;
 }
 
@@ -35,8 +35,8 @@
 
 .tablesContainer {
   display: flex;
-  justify-content: unset;
-  align-items: unset;
+  /* width: 2000px; */
+  /* flex-direction: column; */
   column-gap: 20%;
   /* justify-content: space-around; */
 }
