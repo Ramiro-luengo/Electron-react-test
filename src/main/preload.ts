@@ -28,13 +28,10 @@ contextBridge.exposeInMainWorld('electron', {
 const fileContents = (filepath: string) => {
   const localData: string = path.join(dataPath, filepath);
 
-  let fileData = { error: `File ${filepath} doesn't exist.` };
-  try {
-    if (fs.existsSync(localData)) {
-      fileData = JSON.parse(fs.readFileSync(localData));
-    }
-  } catch (err) {
-    fileData = { error: `File ${filepath} parsing error` };
+  let fileData;
+
+  if (fs.existsSync(localData)) {
+    fileData = JSON.parse(fs.readFileSync(localData));
   }
 
   return fileData;

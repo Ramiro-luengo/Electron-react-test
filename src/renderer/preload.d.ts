@@ -1,6 +1,6 @@
 import { Channels } from 'main/preload';
 
-import { TableMappingComponents, ErrorType } from './types';
+import { TableMappingComponents } from './types';
 
 declare global {
   interface Window {
@@ -15,7 +15,7 @@ declare global {
       };
     };
     fileApi: {
-      fileContents(filename: string): TableMappingComponents | ErrorType;
+      fileContents(filename: string): TableMappingComponents;
       directoryContents(dir: string): Array<{ name: string; type: string }>;
     };
   }

@@ -190,10 +190,15 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
 };
 
 const TablesContainer = ({ filename }) => {
-  const fileData = window.fileApi.fileContents(filename);
+  let fileData;
 
-  if (fileData.error) {
-    return <div>Error: {fileData.error}</div>;
+  try {
+    fileData = window.fileApi.fileContents(filename);
+  } catch (err) {
+    if (err.message.includes('not found')) {
+      return <div>Error: File {filename} not found</div>;
+    }
+    return <div>Error: Parsing error in file {filename}</div>;
   }
 
   const { tables, joins } = processInstructions(fileData);
@@ -218,25 +223,16 @@ const TablesContainer = ({ filename }) => {
 
 const Tables = () => {
   const dirContents = window.fileApi.directoryContents('src/data');
-  const colourStyles = {
-    option: (styles) => {
-      return {
-        ...styles,
-        color: 'black',
-      };
-    },
-  };
 
   const firstDir = dirContents[0];
   const [filename, setFilename] = useState(firstDir.name);
 
   return (
     <div>
-      <div style={{ maxWidth: '400px', margin: 'auto' }}>
+      <div style={{ maxWidth: '400px', margin: 'auto', color: 'black' }}>
         <Select
           name="dir"
           placeholder={firstDir.name}
-          styles={colourStyles}
           onChange={(input) => setFilename(input?.value.name)}
           options={dirContents.map((file) => ({
             value: file,
