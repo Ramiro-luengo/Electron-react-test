@@ -2,11 +2,7 @@ import { useState } from 'react';
 import Xarrow, { Xwrapper } from 'react-xarrows';
 import Select from 'react-select';
 
-import {
-  TableMappingComponents,
-  TableMappingComponent,
-  ErrorType,
-} from 'renderer/types';
+import { TableMappingComponent } from 'renderer/types';
 import './table.css';
 
 interface MappedTable {
@@ -152,7 +148,7 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
       {/* -------- Joins -------- */}
       {joins?.some((join) => !join.drawn) ? (
         <div className="joinsContainer">
-          {joins.filter(({ drawn }) => !drawn).map(Join)}
+          {joins?.filter(({ drawn }) => !drawn).map(Join)}
         </div>
       ) : (
         ''
@@ -194,8 +190,7 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
 };
 
 const TablesContainer = ({ filename }) => {
-  const fileData: TableMappingComponents | ErrorType =
-    window.fileApi.fileContents(filename);
+  const fileData = window.fileApi.fileContents(filename);
 
   if (fileData.error) {
     return <div>Error: {fileData.error}</div>;
