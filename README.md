@@ -1,3 +1,4 @@
 This app draws a DER based from the `src/data` directory.
 
-![image](https://user-images.githubusercontent.com/49006462/178804692-3cd5f32e-36cd-4718-8765-249cff4e8398.png)
+![Dragging_elements_gif](https://user-images.githubusercontent.com/49006462/179070309-d87bb667-192b-4669-9784-3eeebe4fa1a5.gif)
+
