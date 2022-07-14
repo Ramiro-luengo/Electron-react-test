@@ -50,3 +50,13 @@
 li {
   list-style: circle;
 }
+
+.canvas {
+  cursor: grab;
+}
+
+.canvas:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}

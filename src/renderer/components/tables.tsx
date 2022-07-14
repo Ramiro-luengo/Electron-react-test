@@ -238,7 +238,7 @@ const Tables = () => {
   const [filename, setFilename] = useState(firstDir.name);
 
   return (
-    <div style={{ cursor: 'grab' }}>
+    <div className="canvas">
       <div style={{ maxWidth: '400px', margin: 'auto', color: 'black' }}>
         <Select
           name="dir"
