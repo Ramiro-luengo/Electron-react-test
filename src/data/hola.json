@@ -1,9 +1,0 @@
-[
-  {
-    "sourcePath": "extractTableByName | 'Pepe'",
-    "ldmField": "enrichLDMTable | idbsBioreactorV2ExperimentFeedSetupProcessMap4 | Feed Configuration | processes",
-    "ldmPath": "",
-    "preserve": true,
-    "condition": "tableValueEqualsCondition | Parent Sample Details | c Control | c Filterc"
-  }
-]

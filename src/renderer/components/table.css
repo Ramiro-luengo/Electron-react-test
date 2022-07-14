@@ -1,14 +1,29 @@
-.table {
-  /* background: #eeeeee; */
-  background: grey;
-  border: 2px solid black;
+.canvasElement {
   border-radius: 15px;
   color: black;
-  /* color: rgb(220, 155, 71); */
   padding-left: 2%;
   padding-right: 2%;
   padding-top: 2%;
-  /* word-break: break-all; */
+  border: 2px solid black;
+}
+
+.canvasElement:hover {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.canvasElement:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.table {
+  background: grey;
+  width: 600px;
+  max-height: 400px;
 }
 
 .containerTitle {
@@ -18,12 +33,6 @@
 
 .join {
   background: rgba(251, 229, 163, 255);
-  border: 2px solid black;
-  border-radius: 15px;
-  color: black;
-  padding-left: 2%;
-  padding-right: 2%;
-  padding-top: 2%;
 }
 
 .joinsContainer {
@@ -35,10 +44,7 @@
 
 .tablesContainer {
   display: flex;
-  /* width: 2000px; */
-  /* flex-direction: column; */
   column-gap: 20%;
-  /* justify-content: space-around; */
 }
 
 li {

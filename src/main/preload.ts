@@ -1,6 +1,10 @@
+/* eslint-disable no-restricted-syntax */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import fs from 'fs';
 import path from 'path';
+
+import LineByLine from 'n-readlines';
+import JSON_minify from './jsonMinify';
 
 const dataPath = 'src/data';
 
@@ -24,26 +28,95 @@ contextBridge.exposeInMainWorld('electron', {
   },
 });
 
-// Source: https://dev.to/taw/electron-adventures-episode-22-file-manager-in-react-hi2
-const fileContents = (filepath: string) => {
-  const localData: string = path.join(dataPath, filepath);
+const preprocessJsFile = (filepath: string) => {
+  const liner = new LineByLine(filepath);
 
-  let fileData;
+  let mappings = false;
+  let stop = false;
+  let jsonData = '[\n';
+  let line;
 
-  if (fs.existsSync(localData)) {
-    fileData = JSON.parse(fs.readFileSync(localData));
+  while ((line = liner.next())) {
+    let lineStr: string = line.toString();
+
+    if (
+      lineStr.includes('mappings') &&
+      lineStr.includes('()') &&
+      lineStr.includes('{')
+    ) {
+      mappings = true;
+      line = liner.next();
+      continue;
+    }
+
+    if (mappings && lineStr.trim() === ']') {
+      stop = true;
+      jsonData += ']\n';
+    }
+
+    if (mappings && !stop) {
+      const preserveRe = lineStr.match('preserve: (.*),');
+      const ldmFieldRe = lineStr.match('"ldmField": (.*),');
+      const ldmPathRe = lineStr.match('"ldmPath": (.*),');
+      const conditionRe = lineStr.match('condition: (.*)');
+
+      if (preserveRe) {
+        lineStr = preserveRe.input?.replaceAll('preserve', '"preserve"');
+      }
+      if (conditionRe) {
+        lineStr = conditionRe.input?.replaceAll('condition:', '"condition":');
+        lineStr = lineStr.replaceAll("'", '"');
+      }
+      if (ldmFieldRe || ldmPathRe) {
+        lineStr = lineStr.replaceAll("'", '"');
+      }
+
+      jsonData += `${lineStr}\n`;
+    }
   }
 
-  return fileData;
+  return jsonData;
+};
+
+// Source: https://dev.to/taw/electron-adventures-episode-22-file-manager-in-react-hi2
+const fileContents = (filepath: string) => {
+  const localPath: string = path.join(dataPath, filepath);
+
+  return JSON.parse(fs.readFileSync(localPath));
 };
 
 const directoryContents = (dir: string) => {
-  const results = fs.readdirSync(dir, { withFileTypes: true });
+  let results = fs.readdirSync(dir, { withFileTypes: true });
 
-  return results.map((entry) => ({
+  results = results.map((entry) => ({
     name: entry.name,
     type: entry.isDirectory() ? 'directory' : 'file',
   }));
+
+  for (const result of results) {
+    const filename = path.parse(result.name);
+
+    if (filename.ext === '.js') {
+      const localPath = path.join(
+        dataPath,
+        result.name.replace('.js', '.json')
+      );
+
+      if (!fs.existsSync(localPath)) {
+        console.log(`Generating file ${localPath}`);
+        const localPath = path.join(dataPath, result.name);
+        const strFileData: string = preprocessJsFile(localPath);
+        const fileData = JSON.parse(JSON_minify(strFileData));
+
+        fs.writeFileSync(
+          localPath.replaceAll('.js', '.json'),
+          JSON.stringify(fileData)
+        );
+      }
+    }
+  }
+
+  return results.filter((result) => path.parse(result.name).ext === '.json');
 };
 
 contextBridge.exposeInMainWorld('fileApi', {

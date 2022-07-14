@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import Xarrow, { Xwrapper } from 'react-xarrows';
+import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import Select from 'react-select';
+import Draggable from 'react-draggable';
+import ScrollContainer from 'react-indiana-drag-scroll';
 
 import { TableMappingComponent } from 'renderer/types';
 import './table.css';
@@ -44,7 +46,7 @@ const Join = (mappedJoin: MappedJoin) => {
   const { id, /* name, */ enrichments } = mappedJoin;
 
   return (
-    <div id={`join_${id}`} className="join">
+    <div id={`join_${id}`} className="join canvasElement">
       {/* <div className="containerTitle">{name}</div> */}
       <div className="containerTitle">LDM Table Enrichments:</div>
       <ul>
@@ -118,7 +120,11 @@ const processInstructions = (instructions: Array<TableMappingComponent>) => {
   };
 };
 
-const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
+const Table = (
+  tableData: MappedTable,
+  updateXarrow: () => void, // Hook from Xarrow Lib.
+  joins?: Array<MappedJoin>
+) => {
   const { name: tableName, mappings, enrichments, tableId } = tableData;
 
   return (
@@ -129,60 +135,62 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
         columnGap: '14%',
       }}
     >
-      <div className="table" id={`table_${tableId}`}>
-        <div style={{ fontWeight: 'bold' }}>{tableName}</div>
-        <div className="containerTitle">LDM Table Mappings:</div>
-        <ul>
-          {mappings.map((mapping) => (
-            <li>{mapping}</li>
-          ))}
-        </ul>
-        <div className="containerTitle">LDM Table Enrichments:</div>
-        <ul>
-          {enrichments.map((enrichment) => (
-            <li>{enrichment}</li>
-          ))}
-        </ul>
-      </div>
+      <Draggable onDrag={updateXarrow} onStop={updateXarrow}>
+        <div className="table canvasElement" id={`table_${tableId}`}>
+          <div style={{ fontWeight: 'bold' }}>{tableName}</div>
+          <div className="containerTitle">LDM Table Mappings:</div>
+          <ul>
+            {mappings.map((mapping) => (
+              <li>{mapping}</li>
+            ))}
+          </ul>
+          <div className="containerTitle">LDM Table Enrichments:</div>
+          <ul>
+            {enrichments.map((enrichment) => (
+              <li>{enrichment}</li>
+            ))}
+          </ul>
+        </div>
+      </Draggable>
 
       {/* -------- Joins -------- */}
-      {joins?.some((join) => !join.drawn) ? (
-        <div className="joinsContainer">
-          {joins?.filter(({ drawn }) => !drawn).map(Join)}
-        </div>
-      ) : (
-        ''
-      )}
+      <Draggable onDrag={updateXarrow} onStop={updateXarrow}>
+        {joins?.some((join) => !join.drawn) ? (
+          <div className="joinsContainer">
+            {joins?.filter(({ drawn }) => !drawn).map(Join)}
+          </div>
+        ) : (
+          <div />
+        )}
+      </Draggable>
       {/* ------- Joins end ------- */}
 
       {/* -------- Arrows -------- */}
       <Xwrapper>
-        {joins
-          ? joins.map(({ name, id }) => {
-              const splittedName: Array<string> = name
-                .split('|')
-                .map((v) => v.replaceAll("'", '').trim());
-              const labelIdx: number = splittedName.indexOf(tableName) + 1;
+        {joins?.map(({ name, id }) => {
+          const splittedName: Array<string> = name
+            .split('|')
+            .map((v) => v.replaceAll("'", '').trim());
+          const labelIdx: number = splittedName.indexOf(tableName) + 1;
 
-              return (
-                <Xarrow
-                  strokeWidth={1}
-                  showHead={false}
-                  path="straight"
-                  lineColor="white"
-                  labels={{
-                    middle: (
-                      <div style={{ color: 'white', fontSize: 11 }}>
-                        {splittedName[labelIdx]}
-                      </div>
-                    ),
-                  }}
-                  start={`table_${tableId}`}
-                  end={`join_${id}`}
-                />
-              );
-            })
-          : ''}
+          return (
+            <Xarrow
+              strokeWidth={1}
+              showHead={false}
+              path="straight"
+              lineColor="white"
+              labels={{
+                middle: (
+                  <div style={{ color: 'white', fontSize: 11 }}>
+                    {splittedName[labelIdx]}
+                  </div>
+                ),
+              }}
+              start={`table_${tableId}`}
+              end={`join_${id}`}
+            />
+          );
+        })}
       </Xwrapper>
       {/* ------ Arrows end ------ */}
     </div>
@@ -191,6 +199,7 @@ const Table = (tableData: MappedTable, joins?: Array<MappedJoin>) => {
 
 const TablesContainer = ({ filename }) => {
   let fileData;
+  const updateXarrow = useXarrow();
 
   try {
     fileData = window.fileApi.fileContents(filename);
@@ -198,6 +207,7 @@ const TablesContainer = ({ filename }) => {
     if (err.message.includes('not found')) {
       return <div>Error: File {filename} not found</div>;
     }
+    console.dir(err);
     return <div>Error: Parsing error in file {filename}</div>;
   }
 
@@ -211,11 +221,11 @@ const TablesContainer = ({ filename }) => {
           join.name.includes(table.name)
         );
         newJoins = newJoins.filter((join) => !tableJoins.includes(join.name));
-        if (tableJoins) {
-          return Table(table, tableJoins);
-        }
+        // if (tableJoins) {
+        return Table(table, updateXarrow, tableJoins);
+        // }
 
-        return Table(table);
+        // return Table(table, updateXarrow);
       })}
     </div>
   );
@@ -228,7 +238,7 @@ const Tables = () => {
   const [filename, setFilename] = useState(firstDir.name);
 
   return (
-    <div>
+    <div style={{ cursor: 'grab' }}>
       <div style={{ maxWidth: '400px', margin: 'auto', color: 'black' }}>
         <Select
           name="dir"
@@ -240,7 +250,9 @@ const Tables = () => {
           }))}
         />
       </div>
-      <TablesContainer filename={filename} />
+      <ScrollContainer ignoreElements=".canvasElement" component="body">
+        <TablesContainer filename={filename} />
+      </ScrollContainer>
     </div>
   );
 };
