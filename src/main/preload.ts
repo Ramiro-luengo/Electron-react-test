@@ -86,9 +86,7 @@ const fileContents = (filepath: string) => {
 };
 
 const directoryContents = (dir: string) => {
-  let results = fs.readdirSync(dir, { withFileTypes: true });
-
-  results = results.map((entry) => ({
+  let results = fs.readdirSync(dir, { withFileTypes: true }).map((entry) => ({
     name: entry.name,
     type: entry.isDirectory() ? 'directory' : 'file',
   }));
@@ -97,14 +95,11 @@ const directoryContents = (dir: string) => {
     const filename = path.parse(result.name);
 
     if (filename.ext === '.js') {
-      const localPath = path.join(
-        dataPath,
-        result.name.replace('.js', '.json')
-      );
+      let localPath = path.join(dataPath, result.name.replace('.js', '.json'));
 
       if (!fs.existsSync(localPath)) {
         console.log(`Generating file ${localPath}`);
-        const localPath = path.join(dataPath, result.name);
+        localPath = path.join(dataPath, result.name);
         const strFileData: string = preprocessJsFile(localPath);
         const fileData = JSON.parse(JSON_minify(strFileData));
 
@@ -115,6 +110,11 @@ const directoryContents = (dir: string) => {
       }
     }
   }
+
+  results = fs.readdirSync(dir, { withFileTypes: true }).map((entry) => ({
+    name: entry.name,
+    type: entry.isDirectory() ? 'directory' : 'file',
+  }));
 
   return results.filter((result) => path.parse(result.name).ext === '.json');
 };

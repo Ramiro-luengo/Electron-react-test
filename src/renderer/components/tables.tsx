@@ -43,7 +43,7 @@ const Join = (mappedJoin: MappedJoin) => {
   // Set to true so we don't re-draw the join.
   mappedJoin.drawn = true;
 
-  const { id, /* name, */ enrichments } = mappedJoin;
+  const { id, enrichments } = mappedJoin;
 
   return (
     <div id={`join_${id}`} className="join canvasElement">
@@ -221,11 +221,7 @@ const TablesContainer = ({ filename }) => {
           join.name.includes(table.name)
         );
         newJoins = newJoins.filter((join) => !tableJoins.includes(join.name));
-        // if (tableJoins) {
         return Table(table, updateXarrow, tableJoins);
-        // }
-
-        // return Table(table, updateXarrow);
       })}
     </div>
   );
