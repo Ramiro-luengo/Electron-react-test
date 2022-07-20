@@ -40,11 +40,12 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  height: fit-content;
 }
 
 .tablesContainer {
   display: flex;
-  column-gap: 20%;
+  column-gap: 130px;
 }
 
 li {
@@ -53,6 +54,8 @@ li {
 
 .canvas {
   cursor: grab;
+  width: 100%;
+  height: 100%;
 }
 
 .canvas:active {
@@ -60,3 +63,36 @@ li {
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
+
+.controlBtn {
+  padding: 0;
+  margin-bottom: 10px;
+  width: 40px;
+  height: 40px;
+}
+
+.fileSelect {
+  /* width: 300px; */
+  /* margin: auto; */
+  color: black;
+}
+
+/* .fileSelect {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  width: 300px;
+  margin: auto;
+  color: black;
+} */
+
+/* @media screen and (max-width: 1376px) {
+  .fileSelect {
+    position: unset;
+    width: 300px;
+
+    color: black;
+  }
+} */

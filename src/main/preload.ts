@@ -1,12 +1,13 @@
 /* eslint-disable no-restricted-syntax */
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent, dialog } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
 import LineByLine from 'n-readlines';
 import JSON_minify from './jsonMinify';
 
-const dataPath = 'src/data';
+// const dataPath = 'src/data';
+// const dataPath = 'C:\\Users\\Ramiro\\Desktop';
 
 export type Channels = 'ipc-example';
 
@@ -79,7 +80,7 @@ const preprocessJsFile = (filepath: string) => {
 };
 
 // Source: https://dev.to/taw/electron-adventures-episode-22-file-manager-in-react-hi2
-const fileContents = (filepath: string) => {
+const fileContents = (dataPath: string, filepath: string) => {
   const localPath: string = path.join(dataPath, filepath);
 
   return JSON.parse(fs.readFileSync(localPath));
@@ -95,11 +96,11 @@ const directoryContents = (dir: string) => {
     const filename = path.parse(result.name);
 
     if (filename.ext === '.js') {
-      let localPath = path.join(dataPath, result.name.replace('.js', '.json'));
+      let localPath = path.join(dir, result.name.replace('.js', '.json'));
 
       if (!fs.existsSync(localPath)) {
         console.log(`Generating file ${localPath}`);
-        localPath = path.join(dataPath, result.name);
+        localPath = path.join(dir, result.name);
         const strFileData: string = preprocessJsFile(localPath);
         const fileData = JSON.parse(JSON_minify(strFileData));
 
@@ -122,4 +123,5 @@ const directoryContents = (dir: string) => {
 contextBridge.exposeInMainWorld('fileApi', {
   fileContents,
   directoryContents,
+  openDir: () => ipcRenderer.invoke('open-dir'),
 });

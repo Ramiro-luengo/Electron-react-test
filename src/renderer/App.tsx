@@ -1,7 +1,9 @@
 import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
 import icon from '../../assets/icon.svg';
+import Tables from './components/tableView/tables';
+import EditTables from './components/editTables';
 import './App.css';
-import Tables from './components/tables';
 
 const Hello = () => {
   return (
@@ -11,7 +13,10 @@ const Hello = () => {
       </div>
       <div className="Center">
         <Link to="/tables">
-          <button type="button">Tables</button>
+          <button type="button">Tables view</button>
+        </Link>
+        <Link to="/edit">
+          <button type="button">Tables edit</button>
         </Link>
       </div>
     </div>
@@ -24,6 +29,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Hello />} />
         <Route path="/tables" element={<Tables />} />
+        <Route path="/edit" element={<EditTables />} />
       </Routes>
     </Router>
   );

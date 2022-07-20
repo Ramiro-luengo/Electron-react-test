@@ -15,8 +15,9 @@ declare global {
       };
     };
     fileApi: {
-      fileContents(filename: string): TableMappingComponents;
+      fileContents(dataPath: string, filename: string): TableMappingComponents;
       directoryContents(dir: string): Array<{ name: string; type: string }>;
+      openDir(): Promise<{ filePaths: Array<string>; canceled: boolean }>;
     };
   }
 }

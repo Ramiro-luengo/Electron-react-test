@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
-import Select from 'react-select';
+import { MapInteractionCSS } from 'react-map-interaction';
 import Draggable from 'react-draggable';
-import ScrollContainer from 'react-indiana-drag-scroll';
+import Select from 'react-select';
+import { Resizable } from 're-resizable';
 
 import { TableMappingComponent } from 'renderer/types';
 import './table.css';
@@ -46,8 +47,7 @@ const Join = (mappedJoin: MappedJoin) => {
   const { id, enrichments } = mappedJoin;
 
   return (
-    <div id={`join_${id}`} className="join canvasElement">
-      {/* <div className="containerTitle">{name}</div> */}
+    <div id={`join_${id}`} key={`join_${id}`} className="join canvasElement">
       <div className="containerTitle">LDM Table Enrichments:</div>
       <ul>
         {enrichments.map((enrichment) => (
@@ -123,12 +123,15 @@ const processInstructions = (instructions: Array<TableMappingComponent>) => {
 const Table = (
   tableData: MappedTable,
   updateXarrow: () => void, // Hook from Xarrow Lib.
-  joins?: Array<MappedJoin>
+  joins: Array<MappedJoin>,
+  idx: number,
+  scale: number
 ) => {
   const { name: tableName, mappings, enrichments, tableId } = tableData;
 
   return (
     <div
+      key={`${tableName}__${idx}`}
       style={{
         display: 'flex',
         flexDirection: 'row',
@@ -136,7 +139,11 @@ const Table = (
       }}
     >
       <Draggable onDrag={updateXarrow} onStop={updateXarrow}>
-        <div className="table canvasElement" id={`table_${tableId}`}>
+        <div
+          className="table canvasElement"
+          id={`table_${tableId}`}
+          key={`table_${tableId}`}
+        >
           <div style={{ fontWeight: 'bold' }}>{tableName}</div>
           <div className="containerTitle">LDM Table Mappings:</div>
           <ul>
@@ -166,43 +173,53 @@ const Table = (
       {/* ------- Joins end ------- */}
 
       {/* -------- Arrows -------- */}
-      <Xwrapper>
-        {joins?.map(({ name, id }) => {
-          const splittedName: Array<string> = name
-            .split('|')
-            .map((v) => v.replaceAll("'", '').trim());
-          const labelIdx: number = splittedName.indexOf(tableName) + 1;
+      {/* <Xwrapper> */}
+      {joins?.map(({ name, id }) => {
+        const splittedName: Array<string> = name
+          .split('|')
+          .map((v) => v.replaceAll("'", '').trim());
+        const labelIdx: number = splittedName.indexOf(tableName) + 1;
 
-          return (
-            <Xarrow
-              strokeWidth={1}
-              showHead={false}
-              path="straight"
-              lineColor="white"
-              labels={{
-                middle: (
-                  <div style={{ color: 'white', fontSize: 11 }}>
-                    {splittedName[labelIdx]}
-                  </div>
-                ),
-              }}
-              start={`table_${tableId}`}
-              end={`join_${id}`}
-            />
-          );
-        })}
-      </Xwrapper>
+        return (
+          <Xarrow
+            strokeWidth={1}
+            showHead={false}
+            path="straight"
+            lineColor="white"
+            SVGcanvasStyle={{ transform: `scale(${1 / scale})` }}
+            labels={{
+              middle: (
+                <div style={{ color: 'white', fontSize: 11 }}>
+                  {splittedName[labelIdx]}
+                </div>
+              ),
+            }}
+            start={`table_${tableId}`}
+            end={`join_${id}`}
+          />
+        );
+      })}
+      {/* </Xwrapper> */}
       {/* ------ Arrows end ------ */}
     </div>
   );
 };
 
-const TablesContainer = ({ filename }) => {
+const TablesContainer = ({
+  filename,
+  scale,
+  updateXarrow,
+  dataPath,
+}: {
+  filename: string;
+  scale: number;
+  updateXarrow: () => void;
+  dataPath: string;
+}) => {
   let fileData;
-  const updateXarrow = useXarrow();
 
   try {
-    fileData = window.fileApi.fileContents(filename);
+    fileData = window.fileApi.fileContents(dataPath, filename);
   } catch (err) {
     if (err.message.includes('not found')) {
       return <div>Error: File {filename} not found</div>;
@@ -216,39 +233,101 @@ const TablesContainer = ({ filename }) => {
 
   return (
     <div className="tablesContainer">
-      {tables.map((table) => {
+      {tables.map((table, idx) => {
         const tableJoins = newJoins.filter((join) =>
           join.name.includes(table.name)
         );
         newJoins = newJoins.filter((join) => !tableJoins.includes(join.name));
-        return Table(table, updateXarrow, tableJoins);
+        return Table(table, updateXarrow, tableJoins, idx, scale);
       })}
     </div>
   );
 };
 
 const Tables = () => {
-  const dirContents = window.fileApi.directoryContents('src/data');
+  const [dataPath, setDataPath] = useState('src/data');
+  const [dirContents, setDirContents] = useState(
+    window.fileApi.directoryContents(dataPath)
+  );
 
-  const firstDir = dirContents[0];
-  const [filename, setFilename] = useState(firstDir.name);
+  const firstFile = dirContents[0];
+  const updateXarrow = useXarrow();
+  const [filename, setFilename] = useState(firstFile.name);
+  const defaultTranslation = {
+    scale: 1,
+    translation: { x: 0, y: 0 },
+  };
+  const [translation, setTranslation] = useState(defaultTranslation);
+
+  useEffect(() => {
+    console.log(`Setting dataPath to: ${dataPath}`);
+    const newDirContents = window.fileApi.directoryContents(dataPath);
+    setDirContents(newDirContents);
+    setFilename(newDirContents[0].name);
+  }, [dataPath]);
 
   return (
     <div className="canvas">
-      <div style={{ maxWidth: '400px', margin: 'auto', color: 'black' }}>
-        <Select
-          name="dir"
-          placeholder={firstDir.name}
-          onChange={(input) => setFilename(input?.value.name)}
-          options={dirContents.map((file) => ({
-            value: file,
-            label: file.name,
-          }))}
-        />
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button
+          type="button"
+          onClick={() => {
+            window.fileApi
+              .openDir()
+              .then((result) => {
+                if (result.canceled) {
+                  console.log('Directory selection was canceled');
+                  return;
+                }
+
+                setDataPath(result.filePaths[0]);
+                // return result.filePaths[0];
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }}
+        >
+          Select a directory for mappings
+        </button>
+        <div className="fileSelect">
+          <Select
+            name="dir"
+            placeholder={firstFile.name}
+            onChange={(input) => setFilename(input?.value.name)}
+            options={dirContents.map((file) => ({
+              value: file,
+              label: file.name,
+            }))}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setTranslation(defaultTranslation);
+          }}
+        >
+          Reset zoom
+        </button>
       </div>
-      <ScrollContainer ignoreElements=".canvasElement" component="body">
-        <TablesContainer filename={filename} />
-      </ScrollContainer>
+      <Xwrapper>
+        <MapInteractionCSS
+          showControls
+          btnClass="controlBtn"
+          value={translation}
+          onChange={(t) => {
+            setTranslation(t);
+            updateXarrow();
+          }}
+        >
+          <TablesContainer
+            dataPath={dataPath}
+            filename={filename}
+            scale={translation.scale}
+            updateXarrow={updateXarrow}
+          />
+        </MapInteractionCSS>
+      </Xwrapper>
     </div>
   );
 };
