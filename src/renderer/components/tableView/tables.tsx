@@ -1,9 +1,9 @@
+/* eslint-disable no-restricted-syntax */
 import { useState, useEffect } from 'react';
 import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import { MapInteractionCSS } from 'react-map-interaction';
 import Draggable from 'react-draggable';
 import Select from 'react-select';
-import { Resizable } from 're-resizable';
 
 import { TableMappingComponent } from 'renderer/types';
 import './table.css';
@@ -47,7 +47,12 @@ const Join = (mappedJoin: MappedJoin) => {
   const { id, enrichments } = mappedJoin;
 
   return (
-    <div id={`join_${id}`} key={`join_${id}`} className="join canvasElement">
+    <div
+      data={JSON.stringify(mappedJoin)}
+      id={`join_${id}`}
+      key={`join_${id}`}
+      className="join canvasElement"
+    >
       <div className="containerTitle">LDM Table Enrichments:</div>
       <ul>
         {enrichments.map((enrichment) => (
@@ -120,6 +125,34 @@ const processInstructions = (instructions: Array<TableMappingComponent>) => {
   };
 };
 
+const preProcessJoins = (joins: Array<MappedJoin>) => {
+  /* Filter joins with same tables on both sides. */
+  /* 1. Get table names */
+  /* 2. Form each join from those. */
+  const groupedJoins: Array<Array<MappedJoin>> = new Array<Array<MappedJoin>>();
+  for (let idx = 0; idx < joins.length; idx++) {
+    const join = joins[idx];
+    const { name } = join;
+
+    for (const otherJoin of joins) {
+      if (name === otherJoin.name) {
+        continue;
+      }
+      const parsedNames = [name.split('|')[0], name.split('|')[2]];
+      const otherParsedNames = [
+        otherJoin.name.split('|')[0],
+        otherJoin.name.split('|')[2],
+      ];
+      if (JSON.stringify(parsedNames) === JSON.stringify(otherParsedNames)) {
+        groupedJoins[idx].push();
+      }
+    }
+  }
+  console.log(groupedJoins);
+
+  return joins;
+};
+
 const Table = (
   tableData: MappedTable,
   updateXarrow: () => void, // Hook from Xarrow Lib.
@@ -128,6 +161,9 @@ const Table = (
   scale: number
 ) => {
   const { name: tableName, mappings, enrichments, tableId } = tableData;
+
+  // const processedJoins = preProcessJoins(joins);
+  const processedJoins = joins;
 
   return (
     <div
@@ -162,9 +198,9 @@ const Table = (
 
       {/* -------- Joins -------- */}
       <Draggable onDrag={updateXarrow} onStop={updateXarrow}>
-        {joins?.some((join) => !join.drawn) ? (
+        {processedJoins?.some((join) => !join.drawn) ? (
           <div className="joinsContainer">
-            {joins?.filter(({ drawn }) => !drawn).map(Join)}
+            {processedJoins?.filter(({ drawn }) => !drawn).map(Join)}
           </div>
         ) : (
           <div />
@@ -270,6 +306,7 @@ const Tables = () => {
     <div className="canvas">
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
+          className="button"
           type="button"
           onClick={() => {
             window.fileApi
@@ -302,6 +339,7 @@ const Tables = () => {
           />
         </div>
         <button
+          className="button"
           type="button"
           onClick={() => {
             setTranslation(defaultTranslation);

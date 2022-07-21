@@ -10,7 +10,7 @@ body {
   align-items: center;
 }
 
-button {
+.button {
   background-color: white;
   padding: 10px 20px;
   border-radius: 10px;
@@ -25,15 +25,10 @@ button {
   text-align: center;
 }
 
-button:hover {
+.button:hover {
   transform: scale(1.05);
   opacity: 1;
 }
-
-li {
-  list-style: none;
-}
-
 a {
   text-decoration: none;
   height: fit-content;

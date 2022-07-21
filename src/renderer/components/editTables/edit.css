@@ -1,0 +1,8 @@
+.saveImg {
+  cursor: pointer;
+  transition: all ease-in 0.1s;
+}
+
+.saveImg:hover {
+  transform: scale(1.05);
+}

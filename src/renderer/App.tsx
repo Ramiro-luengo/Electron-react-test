@@ -13,10 +13,14 @@ const Hello = () => {
       </div>
       <div className="Center">
         <Link to="/tables">
-          <button type="button">Tables view</button>
+          <button className="button" type="button">
+            Tables view
+          </button>
         </Link>
         <Link to="/edit">
-          <button type="button">Tables edit</button>
+          <button className="button" type="button">
+            Tables edit
+          </button>
         </Link>
       </div>
     </div>

@@ -64,35 +64,30 @@ li {
   cursor: -webkit-grabbing;
 }
 
+/* Had to copy all the styles from button because of some css quirks */
 .controlBtn {
+  background-color: white;
   padding: 0;
   margin-bottom: 10px;
   width: 40px;
   height: 40px;
+  border-radius: 10px;
+  border: none;
+  appearance: none;
+  font-size: 1.3rem;
+  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
+    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
+  transition: all ease-in 0.1s;
+  cursor: pointer;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.controlBtn:hover {
+  transform: scale(1.05);
+  opacity: 1;
 }
 
 .fileSelect {
-  /* width: 300px; */
-  /* margin: auto; */
   color: black;
 }
-
-/* .fileSelect {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  width: 300px;
-  margin: auto;
-  color: black;
-} */
-
-/* @media screen and (max-width: 1376px) {
-  .fileSelect {
-    position: unset;
-    width: 300px;
-
-    color: black;
-  }
-} */

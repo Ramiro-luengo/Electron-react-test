@@ -2,6 +2,11 @@ import Select from 'react-select';
 import { useEffect, useState } from 'react';
 import ReactJson from 'react-json-view';
 import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+
+import SaveIcon from '../../../../assets/save-icon.svg';
+import 'react-toastify/dist/ReactToastify.css';
+import './edit.css';
 
 const safeAccessFileData = (dataPath: string, filename: string) => {
   let fileData;
@@ -39,10 +44,31 @@ const EditTables = () => {
     setData(safeAccessFileData(dataPath, filename));
   }, [filename, dataPath]);
 
+  const notifyFileSaved = () => toast(`${filename} was saved!`);
+
+  const saveData = () => {
+    window.fileApi.saveFile(dataPath, filename, data);
+    console.log(`${filename} was saved!`);
+    notifyFileSaved();
+  };
+
   return (
     <div>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        theme="light"
+      />
       <Link to="/">
-        <button type="button">Home</button>
+        <button className="button" type="button">
+          Home
+        </button>
       </Link>
       <div
         style={{
@@ -52,6 +78,7 @@ const EditTables = () => {
         }}
       >
         <button
+          className="button"
           type="button"
           onClick={() => {
             window.fileApi
@@ -63,7 +90,6 @@ const EditTables = () => {
                 }
 
                 setDataPath(result.filePaths[0]);
-                // return result.filePaths[0];
               })
               .catch((err) => {
                 console.log(err);
@@ -82,6 +108,21 @@ const EditTables = () => {
               label: file.name,
             }))}
           />
+        </div>
+        <div
+          className="saveImg"
+          id="keyboard"
+          role="button"
+          onClick={() => saveData()}
+          onKeyDown={(e) => {
+            console.log(e);
+            if (e.key === '90' && e.ctrlKey) {
+              saveData();
+            }
+          }}
+          tabIndex={0}
+        >
+          <img width="40px" height="40px" src={SaveIcon} alt="Placeholder" />
         </div>
       </div>
       {data.type === 'div' ? (

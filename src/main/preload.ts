@@ -120,8 +120,14 @@ const directoryContents = (dir: string) => {
   return results.filter((result) => path.parse(result.name).ext === '.json');
 };
 
+const saveFile = (dataPath: string, filepath: string, data: any) => {
+  const localPath = path.join(dataPath, filepath);
+  fs.writeFileSync(localPath, JSON.stringify(data, {}, 2));
+};
+
 contextBridge.exposeInMainWorld('fileApi', {
   fileContents,
   directoryContents,
   openDir: () => ipcRenderer.invoke('open-dir'),
+  saveFile,
 });
