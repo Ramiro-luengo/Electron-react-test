@@ -8,10 +8,11 @@
 }
 
 .canvasElement:hover {
-  cursor: move; /* fallback if grab cursor is unsupported */
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
+  color: rgba(255, 255, 255, 1);
+  box-shadow: 0 5px 15px rgba(241, 238, 243, 0.4);
 }
 
 .canvasElement:active {
@@ -22,7 +23,7 @@
 
 .table {
   background: grey;
-  width: 600px;
+  width: 500px;
   max-height: 400px;
 }
 
@@ -45,7 +46,7 @@
 
 .tablesContainer {
   display: flex;
-  column-gap: 130px;
+  column-gap: 50px;
 }
 
 li {
@@ -64,7 +65,7 @@ li {
   cursor: -webkit-grabbing;
 }
 
-/* Had to copy all the styles from button because of some css quirks */
+/* Had to copy all the styles from button class because of some css quirks */
 .controlBtn {
   background-color: white;
   padding: 0;
@@ -90,4 +91,16 @@ li {
 
 .fileSelect {
   color: black;
+}
+
+.link {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+  margin: 0;
+}
+
+.link:hover {
+  opacity: 1;
+  text-decoration: none;
 }

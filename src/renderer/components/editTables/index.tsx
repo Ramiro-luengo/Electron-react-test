@@ -52,6 +52,21 @@ const EditTables = () => {
     notifyFileSaved();
   };
 
+  const handleKeyPress = (e) => {
+    if (e.code === 'KeyS' && e.ctrlKey) {
+      saveData();
+    }
+  };
+
+  useEffect(() => {
+    // Allows user to save file with ctrl + s.
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  });
+
   return (
     <div>
       <ToastContainer
@@ -65,7 +80,7 @@ const EditTables = () => {
         pauseOnHover
         theme="light"
       />
-      <Link to="/">
+      <Link className="link" to="/">
         <button className="button" type="button">
           Home
         </button>
@@ -109,19 +124,7 @@ const EditTables = () => {
             }))}
           />
         </div>
-        <div
-          className="saveImg"
-          id="keyboard"
-          role="button"
-          onClick={() => saveData()}
-          onKeyDown={(e) => {
-            console.log(e);
-            if (e.key === '90' && e.ctrlKey) {
-              saveData();
-            }
-          }}
-          tabIndex={0}
-        >
+        <div className="saveImg" role="button" onClick={() => saveData()}>
           <img width="40px" height="40px" src={SaveIcon} alt="Placeholder" />
         </div>
       </div>
