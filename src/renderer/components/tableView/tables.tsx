@@ -189,13 +189,19 @@ const preProcessJoins = (joins: Array<MappedJoin>) => {
   return retJoins;
 };
 
-const Table = (
-  tables: Array<MappedTable>,
-  tableData: MappedTable,
-  updateXarrow: () => void, // Hook from Xarrow Lib.
-  idx: number,
-  scale: number
-) => {
+const Table = ({
+  tables,
+  tableData,
+  updateXarrow,
+  idx,
+  scale,
+}: {
+  tables: Array<MappedTable>;
+  tableData: MappedTable;
+  updateXarrow: () => void; // Hook from Xarrow Lib.
+  idx: number;
+  scale: number;
+}) => {
   const {
     name: tableName,
     mappings,
@@ -316,9 +322,15 @@ const TablesContainer = ({
 
   return (
     <div className="tablesContainer">
-      {tables.map((table, idx) => {
-        return Table(tables, table, updateXarrow, idx, scale);
-      })}
+      {tables.map((table, idx) => (
+        <Table
+          tables={tables}
+          tableData={table}
+          updateXarrow={updateXarrow}
+          idx={idx}
+          scale={scale}
+        />
+      ))}
     </div>
   );
 };
